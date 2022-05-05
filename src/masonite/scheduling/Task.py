@@ -125,15 +125,17 @@ class Task:
         elif self.run_at:
             return self._verify_run_at()
 
-        if self.run_every_minute:
+        if (
+            not self.run_every_minute
+            and self.run_every_hour
+            and self._date.hour == 1
+            or not self.run_every_minute
+            and not self.run_every_hour
+            and self.twice_daily
+            and self._date.hour in self.twice_daily
+            or self.run_every_minute
+        ):
             return True
-        elif self.run_every_hour:
-            if self._date.hour / 1 == 1:
-                return True
-        elif self.twice_daily:
-            if self._date.hour in self.twice_daily:
-                return True
-
         return False
 
     def _verify_run_at(self):

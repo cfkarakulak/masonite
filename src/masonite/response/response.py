@@ -101,11 +101,9 @@ class Response:
         return self._get_status_code_by_value(self.get_status_code()) == code
 
     def _get_status_code_by_value(self, value: int) -> "str|None":
-        for key, status in self.statuses.items():
-            if status == value:
-                return key
-
-        return None
+        return next(
+            (key for key, status in self.statuses.items() if status == value), None
+        )
 
     def get_status_code(self) -> str:
         """Gets the HTTP status code of the response as a human string, like "200 OK"."""
@@ -208,8 +206,9 @@ class Response:
             self.header("Content-Type", "application/octet-stream")
             self.header(
                 "Content-Disposition",
-                'attachment; filename="{}{}"'.format(name, Path(location).suffix),
+                f'attachment; filename="{name}{Path(location).suffix}"',
             )
+
         else:
             self.header("Content-Type", mimetypes.guess_type(location)[0])
 

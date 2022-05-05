@@ -155,9 +155,8 @@ class AmazonS3Driver:
         else:
             objects = bucket.objects.all()
 
-        files = []
-        for my_bucket_object in objects.all():
-            if "/" not in my_bucket_object.key:
-                files.append(File(my_bucket_object, my_bucket_object.key))
-
-        return files
+        return [
+            File(my_bucket_object, my_bucket_object.key)
+            for my_bucket_object in objects.all()
+            if "/" not in my_bucket_object.key
+        ]

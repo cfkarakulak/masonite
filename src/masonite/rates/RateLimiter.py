@@ -26,9 +26,7 @@ class RateLimiter:
 
     def clean_key(self, key: str) -> str:
         """Clean the rate limiter key from unicode characters."""
-        if isinstance(key, bytes):
-            return key.decode("utf-8")
-        return key
+        return key.decode("utf-8") if isinstance(key, bytes) else key
 
     def get_limiter(self, name: str) -> "Limiter":
         return self.limiters[name]
@@ -59,8 +57,7 @@ class RateLimiter:
         self.cache.add(f"{key}:timer", available_at, delay)
         # ensure key exists
         self.cache.add(key, 0, delay)
-        hits = self.cache.increment(key)
-        return hits
+        return self.cache.increment(key)
 
     def reset_attempts(self, key: str) -> bool:
         key = self.clean_key(key)
@@ -74,16 +71,12 @@ class RateLimiter:
     def available_at(self, key: str) -> int:
         """Get UNIX integer timestamp at which key will be available again."""
         key = self.clean_key(key)
-        timestamp = int(self.cache.get(f"{key}:timer", 0))
-        return timestamp
+        return int(self.cache.get(f"{key}:timer", 0))
 
     def available_in(self, key: str) -> int:
         """Get seconds in which key will be available again."""
         timestamp = self.available_at(key)
-        if not timestamp:
-            return 0
-        else:
-            return max(0, timestamp - pendulum.now().int_timestamp)
+        return max(0, timestamp - pendulum.now().int_timestamp) if timestamp else 0
 
     def remaining(self, key: str, max_attempts: int) -> int:
         """Get remaining attempts before limitation."""

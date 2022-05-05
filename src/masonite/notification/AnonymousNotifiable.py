@@ -28,9 +28,7 @@ class AnonymousNotifiable(Notifiable):
         try:
             return self._routes[driver]
         except KeyError:
-            raise ValueError(
-                "Routing has not been defined for the driver {}".format(driver)
-            )
+            raise ValueError(f"Routing has not been defined for the driver {driver}")
 
     def send(self, notification, dry=False, fail_silently=False):
         """Send the given notification."""

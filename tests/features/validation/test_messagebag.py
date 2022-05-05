@@ -102,9 +102,7 @@ class TestMessageBag(unittest.TestCase):
         self.bag.reset()
         self.bag.add("email", "Your email is invalid")
 
-        if self.bag:
-            pass
-        else:
+        if not self.bag:
             raise AssertionError("Should assert true as a boolean")
 
     def test_can_work_with_if_statements_and_false(self):
@@ -112,5 +110,3 @@ class TestMessageBag(unittest.TestCase):
 
         if self.bag:
             raise AssertionError("Should not raise when not full")
-        else:
-            pass

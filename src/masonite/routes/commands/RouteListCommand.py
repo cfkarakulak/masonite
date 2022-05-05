@@ -50,18 +50,16 @@ class RouteListCommand(Command):
 
         # build routes table
         header = ["URI", "Name", "Method(s)", "Controller", "Middleware(s)"]
-        rows = list(map(lambda route: self.format_route_as_row(route), routes))
-        rows.sort()
+        rows = sorted(map(lambda route: self.format_route_as_row(route), routes))
         self.render_table(header, rows)
 
     def format_route_as_row(self, route):
         """Format a Route object as a table row."""
         controller = get_controller_name(route.controller)
-        row = [
+        return [
             route.url,
             route.get_name() or "",
             "/".join(map(lambda m: m.upper(), route.request_method)),
             controller,
             ",".join(route.get_middlewares()),
         ]
-        return row

@@ -50,5 +50,5 @@ class Sms:
             "type": self._type,
         }
         if self._client_ref:
-            base_dict.update({"client-ref": self._client_ref})
+            base_dict["client-ref"] = self._client_ref
         return base_dict

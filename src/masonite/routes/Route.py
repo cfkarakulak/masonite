@@ -21,89 +21,89 @@ class Route:
         pass
 
     @classmethod
-    def get(self, url, controller, module_location=None, **options):
+    def get(cls, url, controller, module_location=None, **options):
         return HTTPRoute(
             url,
             controller,
             request_method=["get"],
-            compilers=self.compilers,
-            controllers_locations=module_location or self.controllers_locations,
-            **options,
+            compilers=cls.compilers,
+            controllers_locations=module_location or cls.controllers_locations,
+            **options
         )
 
     @classmethod
-    def post(self, url, controller, **options):
+    def post(cls, url, controller, **options):
         return HTTPRoute(
             url,
             controller,
             request_method=["post"],
-            compilers=self.compilers,
-            controllers_locations=self.controllers_locations,
-            **options,
+            compilers=cls.compilers,
+            controllers_locations=cls.controllers_locations,
+            **options
         )
 
     @classmethod
-    def put(self, url, controller, **options):
+    def put(cls, url, controller, **options):
         return HTTPRoute(
             url,
             controller,
             request_method=["put"],
-            compilers=self.compilers,
-            controllers_locations=self.controllers_locations,
-            **options,
+            compilers=cls.compilers,
+            controllers_locations=cls.controllers_locations,
+            **options
         )
 
     @classmethod
-    def patch(self, url, controller, **options):
+    def patch(cls, url, controller, **options):
         return HTTPRoute(
             url,
             controller,
             request_method=["patch"],
-            compilers=self.compilers,
-            controllers_locations=self.controllers_locations,
-            **options,
+            compilers=cls.compilers,
+            controllers_locations=cls.controllers_locations,
+            **options
         )
 
     @classmethod
-    def delete(self, url, controller, **options):
+    def delete(cls, url, controller, **options):
         return HTTPRoute(
             url,
             controller,
             request_method=["delete"],
-            compilers=self.compilers,
-            controllers_locations=self.controllers_locations,
-            **options,
+            compilers=cls.compilers,
+            controllers_locations=cls.controllers_locations,
+            **options
         )
 
     @classmethod
-    def options(self, url, controller, **options):
+    def options(cls, url, controller, **options):
         return HTTPRoute(
             url,
             controller,
             request_method=["options"],
-            compilers=self.compilers,
-            controllers_locations=self.controllers_locations,
-            **options,
+            compilers=cls.compilers,
+            controllers_locations=cls.controllers_locations,
+            **options
         )
 
     @classmethod
-    def default(self, url, controller, **options):
-        return self
+    def default(cls, url, controller, **options):
+        return cls
 
     @classmethod
-    def redirect(self, url, new_url, **options):
+    def redirect(cls, url, new_url, **options):
         return HTTPRoute(
             url,
             RedirectController.redirect,
             request_method=["get"],
-            compilers=self.compilers,
-            controllers_locations=self.controllers_locations,
+            compilers=cls.compilers,
+            controllers_locations=cls.controllers_locations,
             controller_bindings=[new_url, options.get("status", 302)],
-            **options,
+            **options
         )
 
     @classmethod
-    def view(self, url, template, data=None, **options):
+    def view(cls, url, template, data=None, **options):
         if not data:
             data = {}
 
@@ -111,37 +111,37 @@ class Route:
             url,
             ViewController.show,
             request_method=options.get("method", ["get"]),
-            compilers=self.compilers,
-            controllers_locations=self.controllers_locations,
+            compilers=cls.compilers,
+            controllers_locations=cls.controllers_locations,
             controller_bindings=[template, data],
-            **options,
+            **options
         )
 
     @classmethod
-    def permanent_redirect(self, url, new_url, **options):
+    def permanent_redirect(cls, url, new_url, **options):
         return HTTPRoute(
             url,
             RedirectController.redirect,
             request_method=["get"],
-            compilers=self.compilers,
-            controllers_locations=self.controllers_locations,
+            compilers=cls.compilers,
+            controllers_locations=cls.controllers_locations,
             controller_bindings=[new_url, 301],
-            **options,
+            **options
         )
 
     @classmethod
-    def match(self, request_methods, url, controller, **options):
+    def match(cls, request_methods, url, controller, **options):
         return HTTPRoute(
             url,
             controller,
             request_method=request_methods,
-            compilers=self.compilers,
-            controllers_locations=self.controllers_locations,
-            **options,
+            compilers=cls.compilers,
+            controllers_locations=cls.controllers_locations,
+            **options
         )
 
     @classmethod
-    def group(self, *routes, **options):
+    def group(cls, *routes, **options):
         inner = []
         for route in flatten(routes):
             if options.get("prefix"):
@@ -165,54 +165,66 @@ class Route:
                 route.set_middleware(middleware)
 
             inner.append(route)
-        self.routes = inner
+        cls.routes = inner
         return inner
 
     @classmethod
-    def resource(self, base_url, controller):
+    def resource(cls, base_url, controller):
         return [
-            self.get(f"/{base_url}", f"{controller}@index").name(f"{base_url}.index"),
-            self.get(f"/{base_url}/create", f"{controller}@create").name(
+            cls.get(f"/{base_url}", f"{controller}@index").name(
+                f"{base_url}.index"
+            ),
+            cls.get(f"/{base_url}/create", f"{controller}@create").name(
                 f"{base_url}.create"
             ),
-            self.post(f"/{base_url}", f"{controller}@store").name(f"{base_url}.store"),
-            self.get(f"/{base_url}/@id", f"{controller}@show").name(f"{base_url}.show"),
-            self.get(f"/{base_url}/@id/edit", f"{controller}@edit").name(
+            cls.post(f"/{base_url}", f"{controller}@store").name(
+                f"{base_url}.store"
+            ),
+            cls.get(f"/{base_url}/@id", f"{controller}@show").name(
+                f"{base_url}.show"
+            ),
+            cls.get(f"/{base_url}/@id/edit", f"{controller}@edit").name(
                 f"{base_url}.edit"
             ),
-            self.match(
+            cls.match(
                 ["put", "patch"], f"/{base_url}/@id", f"{controller}@update"
             ).name(f"{base_url}.update"),
-            self.delete(f"/{base_url}/@id", f"{controller}@destroy").name(
+            cls.delete(f"/{base_url}/@id", f"{controller}@destroy").name(
                 f"{base_url}.destroy"
             ),
         ]
 
     @classmethod
-    def api(self, base_url, controller):
+    def api(cls, base_url, controller):
         return [
-            self.get(f"/{base_url}", f"{controller}@index").name(f"{base_url}.index"),
-            self.post(f"/{base_url}", f"{controller}@store").name(f"{base_url}.store"),
-            self.get(f"/{base_url}/@id", f"{controller}@show").name(f"{base_url}.show"),
-            self.match(
+            cls.get(f"/{base_url}", f"{controller}@index").name(
+                f"{base_url}.index"
+            ),
+            cls.post(f"/{base_url}", f"{controller}@store").name(
+                f"{base_url}.store"
+            ),
+            cls.get(f"/{base_url}/@id", f"{controller}@show").name(
+                f"{base_url}.show"
+            ),
+            cls.match(
                 ["put", "patch"], f"/{base_url}/@id", f"{controller}@update"
             ).name(f"{base_url}.update"),
-            self.delete(f"/{base_url}/@id", f"{controller}@destroy").name(
+            cls.delete(f"/{base_url}/@id", f"{controller}@destroy").name(
                 f"{base_url}.destroy"
             ),
         ]
 
     @classmethod
-    def compile(self, key, to=""):
-        self.compilers.update({key: to})
-        return self
+    def compile(cls, key, to=""):
+        cls.compilers.update({key: to})
+        return cls
 
     @classmethod
-    def set_controller_locations(self, *controllers_locations):
-        self.controllers_locations = list(map(modularize, controllers_locations))
-        return self
+    def set_controller_locations(cls, *controllers_locations):
+        cls.controllers_locations = list(map(modularize, controllers_locations))
+        return cls
 
     @classmethod
-    def add_controller_locations(self, *controllers_locations):
-        self.controllers_locations.extend(list(map(modularize, controllers_locations)))
-        return self
+    def add_controller_locations(cls, *controllers_locations):
+        cls.controllers_locations.extend(list(map(modularize, controllers_locations)))
+        return cls

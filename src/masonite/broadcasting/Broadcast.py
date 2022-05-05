@@ -58,7 +58,7 @@ class Broadcast:
                 driver.set_options(store_config).channel(channel, event, value)
 
     @classmethod
-    def routes(self, auth_route="/broadcasting/authorize"):
+    def routes(cls, auth_route="/broadcasting/authorize"):
         from .controllers import BroadcastingController
 
         return [

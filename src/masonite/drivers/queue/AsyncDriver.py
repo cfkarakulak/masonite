@@ -39,7 +39,7 @@ class AsyncDriver:
             except AttributeError:
                 # Could be wanting to call only a method asynchronously
                 future = processor.submit(obj, *args, **kwargs)
-            ran.update({future: obj})
+            ran[future] = obj
 
         if is_blocking:
             for job in as_completed(ran.keys()):
@@ -72,5 +72,5 @@ class AsyncDriver:
         elif mode == "multiprocess":
             processor = ProcessPoolExecutor(max_workers)
         else:
-            raise QueueException("Queue mode {} not recognized".format(mode))
+            raise QueueException(f"Queue mode {mode} not recognized")
         return processor

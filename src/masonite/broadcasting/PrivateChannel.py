@@ -1,7 +1,7 @@
 class PrivateChannel:
     def __init__(self, name):
         if not name.startswith("private-"):
-            name = "private-" + name
+            name = f"private-{name}"
 
         self.name = name
 

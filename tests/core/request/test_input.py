@@ -22,7 +22,7 @@ def encode_multipart_formdata(fields):
         + "--%s--\r\n" % boundary
     )
 
-    content_type = "multipart/form-data; boundary=%s" % boundary
+    content_type = f"multipart/form-data; boundary={boundary}"
 
     return body, content_type
 

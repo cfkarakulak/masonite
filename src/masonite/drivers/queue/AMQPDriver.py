@@ -69,13 +69,8 @@ class AMQPDriver(HasColoredOutput):
             raise ModuleNotFoundError(
                 "Could not find the 'pika' library. Run 'pip install pika' to fix this."
             )
-        connection_url = "amqp://{}:{}@{}{}/{}".format(
-            self.options.get("username"),
-            self.options.get("password"),
-            self.options.get("host"),
-            ":" + str(self.options.get("port")) if self.options.get("port") else "",
-            self.options.get("vhost", "%2F"),
-        )
+        connection_url = f'amqp://{self.options.get("username")}:{self.options.get("password")}@{self.options.get("host")}{":" + str(self.options.get("port")) if self.options.get("port") else ""}/{self.options.get("vhost", "%2F")}'
+
         if self.options.get("connection_options"):
             connection_url += "?" + parse.urlencode(
                 self.options.get("connection_options")
@@ -90,10 +85,9 @@ class AMQPDriver(HasColoredOutput):
 
     def consume(self):
         self.success(
-            '[*] Waiting to process jobs on the "{}" queue. To exit press CTRL+C'.format(
-                self.options.get("queue")
-            )
+            f'[*] Waiting to process jobs on the "{self.options.get("queue")}" queue. To exit press CTRL+C'
         )
+
 
         self.connect()
 

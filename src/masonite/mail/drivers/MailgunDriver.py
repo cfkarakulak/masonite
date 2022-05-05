@@ -23,23 +23,22 @@ class MailgunDriver:
         }
 
         if self.options.get("cc"):
-            data.update({"cc", self.options.get("cc")})
+            data |= {"cc", self.options.get("cc")}
         if self.options.get("bcc"):
             data.update({"bcc", self.options.get("bcc")})
         if self.options.get("priority"):
-            data.update({"h:X-Priority", self.options.get("priority")})
+            data |= {"h:X-Priority", self.options.get("priority")}
         if self.options.get("headers"):
             for header, value in self.options.get("headers").items():
-                data.update({f"h:{header}", value})
+                data |= {f"h:{header}", value}
 
         return data
 
     def get_attachments(self):
-        files = []
-        for attachment in self.options.get("attachments", []):
-            files.append(("attachment", open(attachment.path, "rb")))
-
-        return files
+        return [
+            ("attachment", open(attachment.path, "rb"))
+            for attachment in self.options.get("attachments", [])
+        ]
 
     def send(self):
         domain = self.options["domain"]

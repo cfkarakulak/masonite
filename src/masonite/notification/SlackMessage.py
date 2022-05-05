@@ -111,7 +111,7 @@ class SlackMessage:
             "blocks": json.dumps([block._resolve() for block in self._blocks]),
         }
         if self._mode == self.API_MODE:
-            options.update({"channel": self._to, "token": self._token})
+            options |= {"channel": self._to, "token": self._token}
         return options
 
     def token(self, token):

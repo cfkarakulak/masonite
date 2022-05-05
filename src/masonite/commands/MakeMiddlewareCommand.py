@@ -28,8 +28,9 @@ class MakeMiddlewareCommand(Command):
         content = render_stub_file(self.get_middleware_path(), name)
 
         relative_filename = os.path.join(
-            self.app.make("middlewares.location"), name + ".py"
+            self.app.make("middlewares.location"), f"{name}.py"
         )
+
         filepath = base_path(relative_filename)
         make_directory(filepath)
         if os.path.exists(relative_filename) and not self.option("force"):

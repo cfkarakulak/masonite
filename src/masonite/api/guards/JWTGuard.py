@@ -11,8 +11,7 @@ class JWTGuard:
         return self
 
     def attempt(self, username, password):
-        attempt = self.options.get("model")().attempt(username, password)
-        if attempt:
+        if attempt := self.options.get("model")().attempt(username, password):
             return attempt
 
     def get_auth_column(self, username):

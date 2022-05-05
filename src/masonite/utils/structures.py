@@ -33,14 +33,13 @@ def load(path, object_name=None, default=None, raise_exception=False):
 
     if object_name is None:
         return module
-    else:
-        try:
-            return getattr(module, object_name)
-        except KeyError:
-            if raise_exception:
-                raise LoaderNotFound(f"{object_name} not found in {module_path}")
-            else:
-                return default
+    try:
+        return getattr(module, object_name)
+    except KeyError:
+        if raise_exception:
+            raise LoaderNotFound(f"{object_name} not found in {module_path}")
+        else:
+            return default
 
 
 def data(dictionary={}):

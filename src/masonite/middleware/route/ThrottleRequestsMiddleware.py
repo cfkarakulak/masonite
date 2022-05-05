@@ -28,18 +28,17 @@ class ThrottleRequestsMiddleware(Middleware):
 
         if limit.is_unlimited():
             return request
-        else:
-            key = hashlib.md5(str(limit_string + limit.key).encode()).hexdigest()
-            if RateLimiter.too_many_attempts(key, limit.max_attempts):
-                headers = self.get_headers(key, limit.max_attempts, True)
-                # raise exception or show custom response of limiter
-                if response_callback:
-                    return response_callback(request, response, headers)
-                else:
-                    raise ThrottleRequestsException(headers=headers)
+        key = hashlib.md5(str(limit_string + limit.key).encode()).hexdigest()
+        if RateLimiter.too_many_attempts(key, limit.max_attempts):
+            headers = self.get_headers(key, limit.max_attempts, True)
+            # raise exception or show custom response of limiter
+            if response_callback:
+                return response_callback(request, response, headers)
             else:
-                # delay rates are in minutes
-                RateLimiter.hit(key, limit.delay * 60)
+                raise ThrottleRequestsException(headers=headers)
+        else:
+            # delay rates are in minutes
+            RateLimiter.hit(key, limit.delay * 60)
 
         # add headers to response
         response.with_headers(self.get_headers(key, limit.max_attempts))
@@ -57,10 +56,9 @@ class ThrottleRequestsMiddleware(Middleware):
             "X-RateLimit-Remaining": RateLimiter.remaining(key, max_attempts),
         }
         if limited:
-            headers.update(
-                {
-                    "Retry-After": RateLimiter.available_in(key),
-                    "X-RateLimit-Reset": RateLimiter.available_at(key),
-                }
-            )
+            headers |= {
+                "Retry-After": RateLimiter.available_in(key),
+                "X-RateLimit-Reset": RateLimiter.available_at(key),
+            }
+
         return headers

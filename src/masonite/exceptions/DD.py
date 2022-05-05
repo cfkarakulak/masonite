@@ -26,10 +26,7 @@ class DD:
             inspect.stack()[1].filename,
             inspect.stack()[1].lineno,
         )
-        if self.app.has("ObjDumpList"):
-            dump_list = self.app.make("ObjDumpList")
-        else:
-            dump_list = []
+        dump_list = self.app.make("ObjDumpList") if self.app.has("ObjDumpList") else []
         start = len(dump_list)
         for i, obj in enumerate(args):
             dump_name = f"ObjDump{start + i}"

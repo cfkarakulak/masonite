@@ -14,7 +14,7 @@ from tests.integrations.app.User import User
 
 class CanBroadcast:
     def broadcast_on(self):
-        return Channel(f"private-shipped")
+        return Channel("private-shipped")
 
     def broadcast_with(self):
         return vars(self)
@@ -45,8 +45,7 @@ class WelcomeController(Controller):
     def contact_post(
         self, request: Request, view: View, validator: Validator, response: Response
     ):
-        errors = request.validate(validator.required(["name", "email"]))
-        if errors:
+        if errors := request.validate(validator.required(["name", "email"])):
             return response.back().with_errors(errors)
 
         return view.render("contact")
@@ -85,7 +84,6 @@ class WelcomeController(Controller):
 
     def input(self, request: Request):
         return request.all()
-        return "input"
 
     def forbidden(self):
         return "forbidden", 403

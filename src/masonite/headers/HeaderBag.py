@@ -20,11 +20,7 @@ class HeaderBag:
         return self.bag.get(self.convert_name(name), "")
 
     def render(self) -> list:
-        response = []
-        for name, header in self.bag.items():
-            response.append((name, header.value))
-
-        return response
+        return [(name, header.value) for name, header in self.bag.items()]
 
     def __contains__(self, name: str) -> bool:
         return self.convert_name(name) in self.bag.keys()
@@ -38,11 +34,7 @@ class HeaderBag:
                 self.add(Header(key, value))
 
     def to_dict(self) -> dict:
-        dic = {}
-        for name, header in self.bag.items():
-            dic.update({name: header.value})
-
-        return dic
+        return {name: header.value for name, header in self.bag.items()}
 
     def __getitem__(self, key: str) -> "Header":
         return self.bag[self.convert_name(key)]

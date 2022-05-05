@@ -14,7 +14,7 @@ def hashid(*values, decode=False, min_length=7):
 
             if type(value) == tuple:
                 value = value[0]
-            new_dict.update({key: value})
+            new_dict[key] = value
         return new_dict
 
     if not decode:
@@ -23,10 +23,7 @@ def hashid(*values, decode=False, min_length=7):
             for key, value in values[0].items():
                 if hasattr(value, "value"):
                     value = value.value
-                if str(value).isdigit():
-                    new_dic.update({key: hash_class.encode(int(value))})
-                else:
-                    new_dic.update({key: value})
+                new_dic[key] = hash_class.encode(int(value)) if str(value).isdigit() else value
             return new_dic
 
         return hash_class.encode(*values)

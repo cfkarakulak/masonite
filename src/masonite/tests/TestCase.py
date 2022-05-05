@@ -235,7 +235,7 @@ class TestCase(unittest.TestCase):
             data = {}
         if not self._csrf:
             token = self.application.make("sign").sign("cookie")
-            data.update({"__token": "cookie"})
+            data["__token"] = "cookie"
             http_cookie = f"SESSID={token}; csrf_token={token}"
 
         environ = generate_wsgi(

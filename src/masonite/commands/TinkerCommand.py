@@ -42,9 +42,8 @@ class TinkerCommand(Command):
         from wsgi import application
         from masoniteorm.models import Model
 
-        python_version = "{}.{}.{}".format(
-            sys.version_info.major, sys.version_info.minor, sys.version_info.micro
-        )
+        python_version = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+
         models_directory = self.option("directory") or models_path()
         models = Loader.find_all(Model, models_directory)
         helpers = {
@@ -90,10 +89,7 @@ class TinkerCommand(Command):
                 import readline
             except ImportError:
                 pass
-            # When not using IPython, PYTHONSTARTUP is not used by default, so load any
-            # scripts defined in this var at startup
-            startup_file = os.environ.get("PYTHONSTARTUP")
-            if startup_file:
+            if startup_file := os.environ.get("PYTHONSTARTUP"):
                 if os.path.isfile(startup_file):
                     with open(startup_file, "r") as f:
                         compiled_code = code.compile_command(

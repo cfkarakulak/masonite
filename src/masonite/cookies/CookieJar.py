@@ -50,13 +50,9 @@ class CookieJar:
         self.loaded_cookies.update({key: Cookie(key, value)})
 
     def to_dict(self):
-        dic = {}
         aggregate = self.cookies
         aggregate.update(self.loaded_cookies)
-        for name, cookie in aggregate.items():
-            dic.update({name: cookie.value})
-
-        return dic
+        return {name: cookie.value for name, cookie in aggregate.items()}
 
     def load(self, cookie_string):
         for compound_value in cookie_string.split("; "):
@@ -66,8 +62,7 @@ class CookieJar:
         return self
 
     def render_response(self):
-        cookies = []
-        for name, cookie in {**self.deleted_cookies, **self.all_added()}.items():
-            cookies.append(("Set-Cookie", cookie.render()))
-
-        return cookies
+        return [
+            ("Set-Cookie", cookie.render())
+            for cookie in {**self.deleted_cookies, **self.all_added()}.values()
+        ]

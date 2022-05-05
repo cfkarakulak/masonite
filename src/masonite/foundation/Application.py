@@ -88,13 +88,8 @@ class Application(Container):
         """Check if application is running in console. This is useful to only run some providers
         logic when used in console. We can differenciate if the application is being served or
         if an application command is ran in console."""
-        if len(sys.argv) > 1:
-            return sys.argv[1] != "serve"
-        return True
+        return sys.argv[1] != "serve" if len(sys.argv) > 1 else True
 
     def environment(self) -> str:
         """Helper to get current environment."""
-        if self.is_running_tests():
-            return "testing"
-        else:
-            return os.getenv("APP_ENV")
+        return "testing" if self.is_running_tests() else os.getenv("APP_ENV")

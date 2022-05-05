@@ -69,12 +69,16 @@ class PackageProvider(Provider):
         # get relative module path to package root
         relative_module_path = modularize(relative_dir)
         self.package.module_root = self.__module__[
-            0 : self.__module__.find(relative_module_path) + len(relative_module_path)
+            : self.__module__.find(relative_module_path)
+            + len(relative_module_path)
         ]
+
         module_root_path = as_filepath(self.package.module_root)
         self.package.abs_root = provider_module.__file__[
-            0 : provider_module.__file__.find(module_root_path) + len(module_root_path)
+            : provider_module.__file__.find(module_root_path)
+            + len(module_root_path)
         ]
+
         return self
 
     def name(self, name):

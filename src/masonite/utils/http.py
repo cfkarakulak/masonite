@@ -97,5 +97,5 @@ def generate_wsgi(wsgi={}, path="/", query_string="", method="GET"):
         "PATH_INFO": path,
         "SCRIPT_NAME": "",
     }
-    data.update(wsgi)
+    data |= wsgi
     return data

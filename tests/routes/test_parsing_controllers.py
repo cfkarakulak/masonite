@@ -15,7 +15,6 @@ class SomeController:
 class TestParsingControllerInRoutes(TestCase):
     def setUp(self):
         Route.set_controller_locations("tests.integrations.controllers")
-        pass
 
     def test_use_controller_string_with_method(self):
         route = Route.get("/home", "WelcomeController@test")

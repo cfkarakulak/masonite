@@ -47,7 +47,7 @@ class NotificationManager:
         results = []
         for notifiable in notifiables:
             # get drivers to use for sending this notification
-            drivers = drivers if drivers else notification.via(notifiable)
+            drivers = drivers or notification.via(notifiable)
             if not drivers:
                 raise NotificationException(
                     "No drivers have been defined in via() method of {0} notification.".format(

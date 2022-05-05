@@ -50,16 +50,10 @@ class ServeCommand(Command):
             )
             return
 
-        use_reloader = True
-        threaded = False
         extra_files = [".env", self.app.get_storage_path()]
 
-        if self.option("dont-reload"):
-            use_reloader = False
-
-        if self.option("threaded"):
-            threaded = True
-
+        use_reloader = not self.option("dont-reload")
+        threaded = bool(self.option("threaded"))
         run_simple(
             self.option("host"),
             int(self.option("port")),

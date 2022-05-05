@@ -1,7 +1,7 @@
 class PresenceChannel:
     def __init__(self, name):
         if not name.startswith("presence-"):
-            name = "presence-" + name
+            name = f"presence-{name}"
 
         self.name = name
 

@@ -22,7 +22,7 @@ class HTTPRoute:
         **options,
     ):
         if not url.startswith("/"):
-            url = "/" + url
+            url = f"/{url}"
         if url.endswith("/") and url != "/":
             url = url[:-1]
 
@@ -92,17 +92,17 @@ class HTTPRoute:
                 if "@" in url:
                     url = url.replace("@", "").split(":")[0]
                     if isinstance(parameters, dict):
-                        compiled_url += str(parameters[url]) + "/"
+                        compiled_url += f"{str(parameters[url])}/"
                     elif isinstance(parameters, list):
-                        compiled_url += str(parameters.pop(0)) + "/"
+                        compiled_url += f"{str(parameters.pop(0))}/"
                 elif "?" in url:
                     url = url.replace("?", "").split(":")[0]
                     if isinstance(parameters, dict):
                         compiled_url += str(parameters.get(url, "/")) + "/"
                     elif isinstance(parameters, list):
-                        compiled_url += str(parameters.pop(0)) + "/"
+                        compiled_url += f"{str(parameters.pop(0))}/"
                 else:
-                    compiled_url += url + "/"
+                    compiled_url += f"{url}/"
 
         # The loop isn't perfect and may have an unwanted trailing slash
         if compiled_url.endswith("/"):
@@ -114,7 +114,7 @@ class HTTPRoute:
 
         # Add eventual query parameters
         if query_params:
-            compiled_url += "?" + parse.urlencode(query_params)
+            compiled_url += f"?{parse.urlencode(query_params)}"
         return compiled_url
 
     def _find_controller(self, controller):
@@ -129,7 +129,6 @@ class HTTPRoute:
         """
         if controller is None:
             return None
-        # If the output specified is a string controller e.g. "WelcomeController@show"
         elif isinstance(controller, str):
             if "@" in controller:
                 controller_path, controller_method_str = controller.split("@")
@@ -161,13 +160,11 @@ class HTTPRoute:
                 )
             except LoaderNotFound as e:
                 self.e = e
-                print("\033[93mTrouble importing controller!", str(e), "\033[0m")
-        # controller is an instance with a bound method
+                print("\033[93mTrouble importing controller!", e, "\033[0m")
         elif hasattr(controller, "__self__"):
             _, controller_method_str = controller.__qualname__.split(".")
             self.controller_instance = controller.__self__
 
-        # it's a class or class.method, we don't have to find it, just get the class
         elif hasattr(controller, "__qualname__"):
             if "." in controller.__qualname__:
                 controller_name, controller_method_str = controller.__qualname__.split(
@@ -183,8 +180,7 @@ class HTTPRoute:
                 )
             except LoaderNotFound as e:
                 self.e = e
-                print("\033[93mTrouble importing controller!", str(e), "\033[0m")
-        # it's a controller instance
+                print("\033[93mTrouble importing controller!", e, "\033[0m")
         else:
             self.controller_instance = controller
             controller_method_str = "__call__"
@@ -204,22 +200,17 @@ class HTTPRoute:
             raise SyntaxError(str(self.e))
 
         if app:
-            if self.controller_instance:
-                controller = self.controller_instance
-            else:
-                controller = app.resolve(
-                    self.controller_class, *self.controller_bindings
-                )
+            controller = self.controller_instance or app.resolve(
+                self.controller_class, *self.controller_bindings
+            )
+
             # resolve route parameters
             params = self.extract_parameters(app.make("request").get_path()).values()
-            # Resolve Controller Method
-            response = app.resolve(getattr(controller, self.controller_method), *params)
-            return response
+            return app.resolve(getattr(controller, self.controller_method), *params)
 
-        if self.controller_instance:
-            controller = self.controller_instance
-        else:
-            controller = self.controller_class(*self.controller_bindings)
+        controller = self.controller_instance or self.controller_class(
+            *self.controller_bindings
+        )
 
         return getattr(controller, self.controller_method)()
 
@@ -289,11 +280,9 @@ class HTTPRoute:
                         regex += self.compilers[regex_route.split(":")[1]]
                     except KeyError:
                         raise InvalidRouteCompileException(
-                            'Route compiler "{}" is not an available route compiler. '
-                            "Verify you spelled it correctly or that you have added it using the compile() method.".format(
-                                regex_route.split(":")[1]
-                            )
+                            f'Route compiler "{regex_route.split(":")[1]}" is not an available route compiler. Verify you spelled it correctly or that you have added it using the compile() method.'
                         )
+
 
                 else:
                     regex += self.compilers["default"]
@@ -313,11 +302,9 @@ class HTTPRoute:
                     except KeyError:
                         if self.request:
                             raise InvalidRouteCompileException(
-                                'Route compiler "{}" is not an available route compiler. '
-                                "Verify you spelled it correctly or that you have added it using the compile() method.".format(
-                                    regex_route.split(":")[1]
-                                )
+                                f'Route compiler "{regex_route.split(":")[1]}" is not an available route compiler. Verify you spelled it correctly or that you have added it using the compile() method.'
                             )
+
                         self._compiled_regex = None
                         self._compiled_regex_end = None
                         return

@@ -31,10 +31,9 @@ class Dumper:
         """Get all dumps as Dump objects."""
         if ascending:
             return self.dumps
-        else:
-            new_dumps = self.dumps.copy()
-            new_dumps.reverse()
-            return new_dumps
+        new_dumps = self.dumps.copy()
+        new_dumps.reverse()
+        return new_dumps
 
     def last(self):
         """Return last added dump."""
@@ -56,9 +55,7 @@ class Dumper:
 
         # get name of dumped objects (go up 2 frames)
         some = inspect.currentframe().f_back.f_back.f_locals
-        names = {}
-        for name, var in some.items():
-            names.update({str(var): name})
+        names = {str(var): name for name, var in some.items()}
         named_objects = {}
         for obj in objects:
             # for variables dumped without name, use their type
@@ -66,7 +63,7 @@ class Dumper:
                 f"<class '{obj.__name__}'>" if inspect.isclass(obj) else str(type(obj))
             )
             name = names.get(str(obj), default)
-            named_objects.update({name: obj})
+            named_objects[name] = obj
 
         dump = Dump(
             named_objects,

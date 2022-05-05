@@ -7,9 +7,9 @@ from ..facades import Api
 
 class AuthenticationController(Controller):
     def auth(self, auth: Auth, request: Request, response: Response):
-        user = auth.attempt(request.input("username"), request.input("password"))
-
-        if user:
+        if user := auth.attempt(
+            request.input("username"), request.input("password")
+        ):
             return {"data": user.generate_jwt()}
 
         return response.json(
@@ -17,9 +17,7 @@ class AuthenticationController(Controller):
         )
 
     def reauth(self, request: Request, response: Response):
-        user = Api.attempt_by_token(request.input("token"))
-
-        if user:
+        if user := Api.attempt_by_token(request.input("token")):
             return {"data": user.generate_jwt()}
 
         return response.json(
