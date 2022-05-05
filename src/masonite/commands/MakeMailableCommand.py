@@ -26,8 +26,9 @@ class MakeMailableCommand(Command):
         content = render_stub_file(self.get_mailables_path(), name)
 
         relative_filename = os.path.join(
-            as_filepath(self.app.make("mailables.location")), name + ".py"
+            as_filepath(self.app.make("mailables.location")), f"{name}.py"
         )
+
         filepath = base_path(relative_filename)
         make_directory(filepath)
         if os.path.exists(filepath) and not self.option("force"):

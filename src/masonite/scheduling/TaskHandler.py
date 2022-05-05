@@ -20,11 +20,7 @@ class TaskHandler:
             if run_name and run_name not in task_identifier:
                 continue
 
-            if inspect.isclass(task_class):
-                task = app.resolve(task_class)
-            else:
-                task = task_class
-
+            task = app.resolve(task_class) if inspect.isclass(task_class) else task_class
             # If the class should run then run it
             if task.should_run() or force:
                 task.handle()

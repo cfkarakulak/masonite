@@ -55,9 +55,7 @@ class HttpTestResponse:
 
     def assertIsNotNamed(self, name=None):
         if name is None:
-            assert self.route.name is None, "Route has a name: {}".format(
-                self.route.name
-            )
+            assert self.route.name is None, f"Route has a name: {self.route.name}"
         else:
             assert (
                 self.route.get_name() != name
@@ -302,7 +300,6 @@ class HttpTestResponse:
         assert key in self.route.url_list, "Route does not contain parameter {key}."
         if value is not None:
             assert self.request.param(key) == str(value)
-            pass
         return self
 
     def _ensure_response_is_json(self):

@@ -12,7 +12,7 @@ class MixHelper:
 
     def url(self, path, manifest_dir=""):
         if not path.startswith("/"):
-            path = "/" + path
+            path = f"/{path}"
 
         root_url = config("application.mix_base_url") or config("application.app_url")
 

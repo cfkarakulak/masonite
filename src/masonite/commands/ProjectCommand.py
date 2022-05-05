@@ -55,8 +55,9 @@ class ProjectCommand(Command):
         try:
             if repo and provider not in self.providers:
                 return self.error(
-                    "'provider' option must be in {}".format(",".join(self.providers))
+                    f"""'provider' option must be in {",".join(self.providers)}"""
                 )
+
 
             self.set_api_provider_url_for_repo(provider, repo)
 
@@ -100,17 +101,17 @@ class ProjectCommand(Command):
                         tag_key = "tag_name" if provider == "github" else "name"
                         tags.append(release[tag_key].replace("v", ""))
 
-                tags = sorted(
-                    tags, key=lambda v: [int(i) for i in v.split(".")], reverse=True
-                )
-                # get url from latest tagged version
-                if not tags:
+                if tags := sorted(
+                    tags,
+                    key=lambda v: [int(i) for i in v.split(".")],
+                    reverse=True,
+                ):
+                    zipball = self.get_tag_archive_url(provider, repo, tags[0])
+                else:
                     self.comment(
                         "No tags has been found, using latest commit on master."
                     )
                     zipball = self.get_branch_archive_url(provider, repo, "master")
-                else:
-                    zipball = self.get_tag_archive_url(provider, repo, tags[0])
         except ProjectLimitReached:
             raise ProjectLimitReached(
                 "You have reached your hourly limit of creating new projects with {0}. Try again in 1 hour.".format(
@@ -190,9 +191,7 @@ class ProjectCommand(Command):
 
         if os.path.isdir(target):
             raise ProjectTargetNotEmpty(
-                "{} already exists. You must craft a project in a new directory.".format(
-                    target
-                )
+                f"{target} already exists. You must craft a project in a new directory."
             )
 
     def set_api_provider_url_for_repo(self, provider, repo):
@@ -233,12 +232,10 @@ class ProjectCommand(Command):
             )
             return tag_data.json()["zipball_url"]
         elif provider == "gitlab":
-            return self.get_branch_archive_url("gitlab", repo, "v" + version)
+            return self.get_branch_archive_url("gitlab", repo, f"v{version}")
 
     def get_releases_provider_data(self, provider):
-        if provider == "github":
-            releases_data = self._get("{0}/releases".format(self.api_base_url))
-        elif provider == "gitlab":
+        if provider in ["github", "gitlab"]:
             releases_data = self._get("{0}/releases".format(self.api_base_url))
         return releases_data.json()
 

@@ -41,10 +41,7 @@ class Gate:
             policy = self.policies.get(instance_or_class, None)
         else:
             policy = self.policies.get(instance_or_class.__class__, None)
-        if policy:
-            return policy()
-        else:
-            return None
+        return policy() if policy else None
 
     def before(self, before_callback):
         if not callable(before_callback):
@@ -77,17 +74,11 @@ class Gate:
 
     def any(self, permissions, *args):
         """Check that every of those permissions are allowed."""
-        for permission in permissions:
-            if self.denies(permission, *args):
-                return False
-        return True
+        return not any(self.denies(permission, *args) for permission in permissions)
 
     def none(self, permissions, *args):
         """Check that none of those permissions are allowed."""
-        for permission in permissions:
-            if self.allows(permission, *args):
-                return False
-        return True
+        return not any(self.allows(permission, *args) for permission in permissions)
 
     def authorize(self, permission, *args):
         return self.inspect(permission, *args).authorize()
@@ -120,8 +111,7 @@ class Gate:
             # first check in policy
             permission_method = None
             if len(args) > 0:
-                policy = self.get_policy_for(args[0])
-                if policy:
+                if policy := self.get_policy_for(args[0]):
                     try:
                         permission_method = getattr(policy, permission)
                     except AttributeError:
@@ -163,7 +153,4 @@ class Gate:
     def _get_user(self):
         from ..facades import Request
 
-        if self.user_callback:
-            return self.user_callback()
-        else:
-            return Request.user()
+        return self.user_callback() if self.user_callback else Request.user()

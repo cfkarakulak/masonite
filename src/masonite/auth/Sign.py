@@ -49,10 +49,9 @@ class Sign:
             f = Fernet(self.key)
         except (binascii.Error, ValueError):
             raise InvalidSecretKey(
-                "You have passed an invalid secret key of: {}. Make sure you have correctly added your secret key.".format(
-                    self.key
-                )
+                f"You have passed an invalid secret key of: {self.key}. Make sure you have correctly added your secret key."
             )
+
 
         self.encryption = f.encrypt(bytes(str(value), "utf-8"))
         return self.encryption.decode("utf-8")

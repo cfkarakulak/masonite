@@ -40,27 +40,19 @@ class AppBlock(Block):
 
         # add app route data
         if route:
-            data.update(
-                {
-                    "Route": {
-                        "Controller": get_controller_name(route.controller),
-                        "Name": route.get_name(),
-                        "Middlewares": route.get_middlewares(),
-                    }
-                }
-            )
+            data["Route"] = {
+                "Controller": get_controller_name(route.controller),
+                "Name": route.get_name(),
+                "Middlewares": route.get_middlewares(),
+            }
 
-        # add user route data
-        user = request.user()
-        if user:
-            data.update(
-                {
-                    "User": {
-                        "E-mail": optional(user).email,
-                        "ID": optional(user).id,
-                    }
-                }
-            )
+
+        if user := request.user():
+            data["User"] = {
+                "E-mail": optional(user).email,
+                "ID": optional(user).id,
+            }
+
 
         return data
 

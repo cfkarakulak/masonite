@@ -41,10 +41,9 @@ class Container:
         """
         if inspect.ismodule(class_obj):
             raise StrictContainerException(
-                "Cannot bind module '{}' with key '{}' into the container".format(
-                    class_obj, name
-                )
+                f"Cannot bind module '{class_obj}' with key '{name}' into the container"
             )
+
         if self.strict and name in self.objects:
             raise StrictContainerException(
                 "You cannot override a key inside a strict container"
@@ -117,12 +116,11 @@ class Container:
         """
         if isinstance(name, str):
             return name in self.objects
-        else:
-            try:
-                self._find_obj(name)
-                return True
-            except MissingContainerBindingNotFound:
-                return False
+        try:
+            self._find_obj(name)
+            return True
+        except MissingContainerBindingNotFound:
+            return False
 
         return False
 
@@ -159,14 +157,10 @@ class Container:
             self.remember
             and not passing_arguments
             and inspect.ismethod(obj)
-            and "{}.{}.{}".format(
-                obj.__module__, obj.__self__.__class__.__name__, obj.__name__
-            )
+            and f"{obj.__module__}.{obj.__self__.__class__.__name__}.{obj.__name__}"
             in self._remembered
         ):
-            location = "{}.{}.{}".format(
-                obj.__module__, obj.__self__.__class__.__name__, obj.__name__
-            )
+            location = f"{obj.__module__}.{obj.__self__.__class__.__name__}.{obj.__name__}"
             objects = self._remembered[location]
             try:
                 return obj(*objects)
@@ -202,10 +196,9 @@ class Container:
                         objects.append(passing_arguments.pop(0))
                     except IndexError:
                         raise ContainerError(
-                            "Not enough dependencies passed. Resolving object needs {} dependencies.".format(
-                                len(inspect.signature(obj).parameters)
-                            )
+                            f"Not enough dependencies passed. Resolving object needs {len(inspect.signature(obj).parameters)} dependencies."
                         )
+
                 else:
                     raise ContainerError(
                         "This container is not set to resolve parameters. You can set this in the container"
@@ -216,9 +209,8 @@ class Container:
             if not inspect.ismethod(obj):
                 self._remembered[obj] = objects
             else:
-                signature = "{}.{}.{}".format(
-                    obj.__module__, obj.__self__.__class__.__name__, obj.__name__
-                )
+                signature = f"{obj.__module__}.{obj.__self__.__class__.__name__}.{obj.__name__}"
+
                 self._remembered[signature] = objects
         return obj(*objects)
 
@@ -244,16 +236,16 @@ class Container:
                 if isinstance(key, str):
                     if search.startswith("*"):
                         if key.endswith(search.split("*")[1]):
-                            providers.update({key: value})
+                            providers[key] = value
                     elif search.endswith("*"):
                         if key.startswith(search.split("*")[0]):
-                            providers.update({key: value})
+                            providers[key] = value
                     elif "*" in search:
                         split_search = search.split("*")
                         if key.startswith(split_search[0]) and key.endswith(
                             split_search[1]
                         ):
-                            providers.update({key: value})
+                            providers[key] = value
                     else:
                         raise AttributeError(
                             "There is no '*' in your collection search"
@@ -264,7 +256,7 @@ class Container:
                     inspect.isclass(provider_class)
                     and issubclass(provider_class, search)
                 ) or isinstance(provider_class, search):
-                    providers.update({provider_key: provider_class})
+                    providers[provider_key] = provider_class
 
         return providers
 
@@ -288,10 +280,7 @@ class Container:
 
         for _, provider_class in self.objects.items():
 
-            if (
-                parameter.annotation == provider_class
-                or parameter.annotation == provider_class.__class__
-            ):
+            if parameter.annotation in [provider_class, provider_class.__class__]:
                 obj = provider_class
                 self.fire_hook("resolve", parameter, obj)
 

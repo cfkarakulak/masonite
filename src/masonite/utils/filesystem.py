@@ -38,27 +38,25 @@ def creation_date(path_to_file):
     """
     if platform.system() == "Windows":
         return os.path.getctime(path_to_file)
-    else:
-        stat = os.stat(path_to_file)
-        try:
-            return stat.st_birthtime
-        except AttributeError:
-            # We're probably on Linux. No easy way to get creation dates here,
-            # so we'll settle for when its content was last modified.
-            return stat.st_mtime
+    stat = os.stat(path_to_file)
+    try:
+        return stat.st_birthtime
+    except AttributeError:
+        # We're probably on Linux. No easy way to get creation dates here,
+        # so we'll settle for when its content was last modified.
+        return stat.st_mtime
 
 
 def modified_date(path_to_file):
     if platform.system() == "Windows":
         return os.path.getmtime(path_to_file)
-    else:
-        stat = os.stat(path_to_file)
-        try:
-            return stat.st_mtime
-        except AttributeError:
-            # We're probably on Linux. No easy way to get creation dates here,
-            # so we'll settle for when its content was last modified.
-            return 0
+    stat = os.stat(path_to_file)
+    try:
+        return stat.st_mtime
+    except AttributeError:
+        # We're probably on Linux. No easy way to get creation dates here,
+        # so we'll settle for when its content was last modified.
+        return 0
 
 
 def render_stub_file(stub_file, name):

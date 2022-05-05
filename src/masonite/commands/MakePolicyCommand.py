@@ -35,8 +35,9 @@ class MakePolicyCommand(Command):
                 content = content.replace("__class__", name)
 
         file_name = os.path.join(
-            self.app.make("policies.location").replace(".", "/"), name + ".py"
+            self.app.make("policies.location").replace(".", "/"), f"{name}.py"
         )
+
 
         make_directory(file_name)
         if os.path.exists(file_name) and not self.option("force"):

@@ -6,7 +6,6 @@ class TestRoutes(TestCase):
     def setUp(self):
         super().setUp()
         Route.set_controller_locations("tests.integrations.controllers")
-        pass
 
     def test_can_add_routes(self):
         routes = Route.group(

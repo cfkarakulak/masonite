@@ -54,17 +54,14 @@ class View:
         """Render the given template name with the given context as string."""
         if not isinstance(dictionary, dict):
             raise ViewException(
-                "Second parameter to render method needs to be a dictionary, {} passed.".format(
-                    type(dictionary).__name__
-                )
+                f"Second parameter to render method needs to be a dictionary, {type(dictionary).__name__} passed."
             )
+
 
         self.load_template(template)
 
-        # prepare template context
-        self.dictionary = {}
-        self.dictionary.update(dictionary)
-        self.dictionary.update(self._shared)
+        self.dictionary = dict(dictionary)
+        self.dictionary |= self._shared
         if self.composers:
             self.hydrate_from_composers()
 
@@ -115,8 +112,8 @@ class View:
         for template in self.template.split(self.separator):
             # Append the template onto the compiled_string
             compiled_string += template
-            if self.composers.get("{}*".format(compiled_string)):
-                self.dictionary.update(self.composers["{}*".format(compiled_string)])
+            if self.composers.get(f"{compiled_string}*"):
+                self.dictionary.update(self.composers[f"{compiled_string}*"])
             else:
                 # Add a slash to symbolize going into a deeper directory structure
                 compiled_string += "/"

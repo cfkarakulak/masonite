@@ -25,13 +25,11 @@ class PasswordResetController(Controller):
         return view.render("auth.change_password", {"token": request.param("token")})
 
     def store_changed_password(self, auth: Auth, request: Request, response: Response):
-        errors = request.validate(
+        if errors := request.validate(
             {
                 "password": "required|strong|confirmed",
             }
-        )
-
-        if errors:
+        ):
             return response.back().with_errors(errors)
 
         if auth.reset_password(request.input("password"), request.param("token")):

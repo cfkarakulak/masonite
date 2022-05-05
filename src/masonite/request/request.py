@@ -56,9 +56,8 @@ class Request(ValidatesRequest, AuthorizesRequest):
     def get_path_with_query(self) -> str:
         """Get request path (read from PATH_INFO) environment variable with eventual query
         string parameters."""
-        query_string = self.environ.get("QUERY_STRING")
-        if query_string:
-            return self.get_path() + "?" + query_string
+        if query_string := self.environ.get("QUERY_STRING"):
+            return f"{self.get_path()}?{query_string}"
         else:
             return self.get_path()
 
@@ -73,7 +72,7 @@ class Request(ValidatesRequest, AuthorizesRequest):
     def input(self, name: str, default: str = "") -> str:
         """Get a specific request input value with the given name. If the value does not exist in
         the request return the default value."""
-        name = str(name)
+        name = name
 
         return self.input_bag.get(name, default=default)
 
@@ -97,13 +96,12 @@ class Request(ValidatesRequest, AuthorizesRequest):
     def header(self, name: str, value: str = None) -> "str|None":
         """If no value provided, read the header value with the given name from the request. Else
         add a header in the request with the given name and value."""
-        if value is None:
-            header = self.header_bag.get(name)
-            if not header:
-                return
-            return header.value
-        else:
+        if value is not None:
             return self.header_bag.add(Header(name, value))
+        header = self.header_bag.get(name)
+        if not header:
+            return
+        return header.value
 
     def all(self) -> dict:
         """Get all inputs from the request as a dictionary."""
@@ -120,10 +118,7 @@ class Request(ValidatesRequest, AuthorizesRequest):
     def is_not_safe(self) -> bool:
         """Check if the current request is considered 'safe', meaning that the request method is
         GET, OPTIONS or HEAD."""
-        if not self.get_request_method() in ("GET", "OPTIONS", "HEAD"):
-            return True
-
-        return False
+        return self.get_request_method() not in ("GET", "OPTIONS", "HEAD")
 
     def user(self) -> "None|Any":
         """Get the current authenticated user if any. LoadUserMiddleware needs to be used for user
@@ -143,7 +138,7 @@ class Request(ValidatesRequest, AuthorizesRequest):
     def contains(self, route: str) -> bool:
         """Check if current request path match the given URL."""
         if not route.startswith("/"):
-            route = "/" + route
+            route = f"/{route}"
 
         regex = re.compile(route.replace("*", "[a-zA-Z0-9_]+"))
 

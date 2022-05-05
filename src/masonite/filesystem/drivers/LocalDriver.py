@@ -109,11 +109,8 @@ class LocalDriver:
 
     def get_files(self, directory=""):
         file_path = self.get_path(directory)
-        files = []
-        for f in os.listdir(file_path):
-            if not isfile(join(file_path, f)):
-                continue
-
-            files.append(File(self.get(f), f))
-
-        return files
+        return [
+            File(self.get(f), f)
+            for f in os.listdir(file_path)
+            if isfile(join(file_path, f))
+        ]

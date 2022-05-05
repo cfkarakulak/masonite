@@ -27,9 +27,6 @@ class MiddlewareCapsule:
         if keys is None:
             return self.route_middleware
 
-        if keys is None:
-            keys = []
-
         for key in keys:
             try:
                 found = self.route_middleware[key]
@@ -37,10 +34,7 @@ class MiddlewareCapsule:
                 raise RouteMiddlewareNotFound(
                     f"Could not find the '{key}' middleware key."
                 )
-            if isinstance(found, list):
-                middlewares += found
-            else:
-                middlewares += [found]
+            middlewares += found if isinstance(found, list) else [found]
         return middlewares
 
     def get_http_middleware(self):

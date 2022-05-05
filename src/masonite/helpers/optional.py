@@ -4,10 +4,7 @@ class DefaultType:
         self.obj = obj
 
     def default(self):
-        if callable(self.value):
-            return self.value(self.obj)
-        else:
-            return self.value
+        return self.value(self.obj) if callable(self.value) else self.value
 
     def __getattr__(self, attr):
         return self.default()
@@ -17,10 +14,7 @@ class DefaultType:
 
     def __eq__(self, other):
         value = self.default()
-        if value is None:
-            return other is value
-        else:
-            return other == value
+        return other is value if value is None else other == value
 
 
 class Optional:

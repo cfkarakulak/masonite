@@ -27,8 +27,9 @@ class MakeRuleCommand(Command):
         content = render_stub_file(self.get_stub_rule_path(), name)
 
         relative_filename = os.path.join(
-            as_filepath(self.app.make("validation.location")), name + ".py"
+            as_filepath(self.app.make("validation.location")), f"{name}.py"
         )
+
 
         if os.path.exists(relative_filename) and not self.option("force"):
             self.warning(

@@ -27,8 +27,9 @@ class MakeCommandCommand(Command):
 
         content = render_stub_file(self.get_command_path(), name)
         relative_filename = os.path.join(
-            self.app.make("commands.location"), name + ".py"
+            self.app.make("commands.location"), f"{name}.py"
         )
+
         filepath = base_path(relative_filename)
         make_directory(filepath)
         if os.path.exists(filepath) and not self.option("force"):

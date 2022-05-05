@@ -46,18 +46,12 @@ def as_filepath(dotted_path):
 
 def removeprefix(string, prefix):
     """Implementation of str.removeprefix() function available for Python versions lower than 3.9."""
-    if string.startswith(prefix):
-        return string[len(prefix) :]
-    else:
-        return string
+    return string[len(prefix) :] if string.startswith(prefix) else string
 
 
 def removesuffix(string, suffix):
     """Implementation of str.removesuffix() function available for Python versions lower than 3.9."""
-    if suffix and string.endswith(suffix):
-        return string[: -len(suffix)]
-    else:
-        return string
+    return string[: -len(suffix)] if suffix and string.endswith(suffix) else string
 
 
 def add_query_params(url: str, query_params: dict) -> str:
@@ -68,11 +62,8 @@ def add_query_params(url: str, query_params: dict) -> str:
 
     # parse existing query parameters if any
     existing_query_params = dict(parse.parse_qsl(path_result.query))
-    all_query_params = {**existing_query_params, **query_params}
-
-    # add query parameters to url if any
-    if all_query_params:
-        base_url += "?" + parse.urlencode(all_query_params)
+    if all_query_params := existing_query_params | query_params:
+        base_url += f"?{parse.urlencode(all_query_params)}"
 
     return base_url
 
@@ -81,14 +72,13 @@ def get_controller_name(controller: "str|Any") -> str:
     """Get a controller string name from a controller argument used in routes."""
     # controller is a class or class.method
     if hasattr(controller, "__qualname__"):
-        if "." in controller.__qualname__:
-            controller_str = controller.__qualname__.replace(".", "@")
-        else:
-            controller_str = f"{controller.__qualname__}@__call__"
-    # controller is an instance, so the method will automatically be __call__
+        return (
+            controller.__qualname__.replace(".", "@")
+            if "." in controller.__qualname__
+            else f"{controller.__qualname__}@__call__"
+        )
+
     elif not isinstance(controller, str):
-        controller_str = f"{controller.__class__.__qualname__}@__call__"
-    # controller is anything else: "Controller@method"
+        return f"{controller.__class__.__qualname__}@__call__"
     else:
-        controller_str = str(controller)
-    return controller_str
+        return str(controller)

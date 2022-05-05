@@ -30,4 +30,4 @@ class KeyCommand(Command):
         with open(".env", "w") as file:
             file.writelines(data)
 
-        self.info("Key added to your .env file: {}".format(key))
+        self.info(f"Key added to your .env file: {key}")

@@ -36,10 +36,12 @@ class RedisDriver:
         return value
 
     def get(self, key, default=None, **options):
-        if not self.has(key):
-            return default
-        return self.get_value(
-            self.get_connection().get(f"{self.get_name()}_cache_{key}")
+        return (
+            self.get_value(
+                self.get_connection().get(f"{self.get_name()}_cache_{key}")
+            )
+            if self.has(key)
+            else default
         )
 
     def put(self, key, value, seconds=None, **options):
@@ -63,9 +65,7 @@ class RedisDriver:
         return self.put(key, str(int(self.get(key)) - amount))
 
     def remember(self, key, callable):
-        value = self.get(key)
-
-        if value:
+        if value := self.get(key):
             return value
 
         callable(self)
@@ -88,7 +88,7 @@ class RedisDriver:
     def get_value(self, value):
         value = str(value)
         if value.isdigit():
-            return str(value)
+            return value
         try:
             return json.loads(value)
         except json.decoder.JSONDecodeError:

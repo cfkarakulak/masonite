@@ -17,8 +17,7 @@ class FileDriver:
         return self
 
     def add(self, key, value, seconds=None):
-        exists = self.get(key)
-        if exists:
+        if exists := self.get(key):
             return exists
 
         return self.put(key, str(value), seconds=seconds)
@@ -62,9 +61,7 @@ class FileDriver:
         return self.put(key, str(int(self.get(key)) - amount))
 
     def remember(self, key, callable):
-        value = self.get(key)
-
-        if value:
+        if value := self.get(key):
             return value
 
         callable(self)
@@ -96,7 +93,7 @@ class FileDriver:
     def get_value(self, value):
         value = str(value.split(":", 1)[1])
         if value.isdigit():
-            return str(value)
+            return value
         try:
             return json.loads(value)
         except json.decoder.JSONDecodeError:

@@ -28,7 +28,7 @@ class Loader:
                 f"{os.path.relpath(module_loader.path)}.{name}",
                 raise_exception=raise_exception,
             )
-            _modules.update({name: module})
+            _modules[name] = module
         return _modules
 
     def find(self, class_instance, paths, class_name, raise_exception=False):
@@ -47,10 +47,12 @@ class Loader:
         for module in self.get_modules(paths).values():
             for obj_name, obj in inspect.getmembers(module):
                 # check if obj is the same class as the given one
-                if inspect.isclass(obj) and issubclass(obj, class_instance):
-                    # check if the class really belongs to those paths to load internal only
-                    if obj.__module__.startswith(module.__package__):
-                        _classes.update({obj_name: obj})
+                if (
+                    inspect.isclass(obj)
+                    and issubclass(obj, class_instance)
+                    and obj.__module__.startswith(module.__package__)
+                ):
+                    _classes[obj_name] = obj
         if not len(_classes.keys()) and raise_exception:
             raise LoaderNotFound(f"No {class_instance} have been found in {paths}")
         return _classes
@@ -70,9 +72,8 @@ class Loader:
         return dict(inspect.getmembers(module, filter_method))
 
     def get_parameters(self, module_or_path):
-        _parameters = {}
-        for name, obj in self.get_objects(module_or_path).items():
-            if parameters_filter(name, obj):
-                _parameters.update({name: obj})
-
-        return _parameters
+        return {
+            name: obj
+            for name, obj in self.get_objects(module_or_path).items()
+            if parameters_filter(name, obj)
+        }

@@ -23,10 +23,7 @@ class Collection:
         Returns:
             int
         """
-        if number < 0:
-            return self[number:]
-
-        return self[:number]
+        return self[number:] if number < 0 else self[:number]
 
     def first(self, callback=None):
         """Takes the first result in the items.
@@ -42,10 +39,7 @@ class Collection:
         filtered = self
         if callback:
             filtered = self.filter(callback)
-        response = None
-        if filtered:
-            response = filtered[0]
-        return response
+        return filtered[0] if filtered else None
 
     def last(self, callback=None):
         """Takes the last result in the items.
@@ -101,14 +95,13 @@ class Collection:
         Returns:
             int -- Returns the average.
         """
-        result = 0
         items = self._get_value(key) or self._items
 
         try:
             return max(items)
         except (TypeError, ValueError):
             pass
-        return result
+        return 0
 
     def chunk(self, size: int):
         """Chunks the items.
@@ -119,9 +112,7 @@ class Collection:
         Returns:
             int -- Returns the average.
         """
-        items = []
-        for i in range(0, self.count(), size):
-            items.append(self[i : i + size])
+        items = [self[i : i + size] for i in range(0, self.count(), size)]
         return self.__class__(items)
 
     def collapse(self):
@@ -157,7 +148,7 @@ class Collection:
 
     def every(self, callback):
         self._check_is_callable(callback)
-        return all([callback(x) for x in self])
+        return all(callback(x) for x in self)
 
     def filter(self, callback):
         self._check_is_callable(callback)
@@ -167,12 +158,10 @@ class Collection:
         def _flatten(items):
             if isinstance(items, dict):
                 for v in items.values():
-                    for x in _flatten(v):
-                        yield x
+                    yield from _flatten(v)
             elif isinstance(items, list):
                 for i in items:
-                    for j in _flatten(i):
-                        yield j
+                    yield from _flatten(i)
             else:
                 yield items
 
@@ -231,11 +220,7 @@ class Collection:
         return self
 
     def pluck(self, value, key=None):
-        if key:
-            attributes = {}
-        else:
-            attributes = []
-
+        attributes = {} if key else []
         if isinstance(self._items, dict):
             return Collection([self._items.get(value)])
 
@@ -259,8 +244,7 @@ class Collection:
         return Collection(attributes)
 
     def pop(self):
-        last = self._items.pop()
-        return last
+        return self._items.pop()
 
     def prepend(self, value):
         self._items.insert(0, value)
@@ -351,10 +335,7 @@ class Collection:
 
         self.sort(key)
 
-        new_dict = {}
-
-        for k, v in groupby(self._items, key=lambda x: x[key]):
-            new_dict.update({k: list(v)})
+        new_dict = {k: list(v) for k, v in groupby(self._items, key=lambda x: x[key])}
 
         return Collection(new_dict)
 
@@ -396,10 +377,7 @@ class Collection:
         attributes = []
 
         for item in self._items:
-            if isinstance(item, dict):
-                comparison = item.get(key)
-            else:
-                comparison = getattr(item, key)
+            comparison = item.get(key) if isinstance(item, dict) else getattr(item, key)
             if self._make_comparison(comparison, value, op):
                 attributes.append(item)
 
@@ -410,9 +388,7 @@ class Collection:
         if not isinstance(items, list):
             raise ValueError("The 'items' parameter must be a list or a Collection")
 
-        _items = []
-        for x, y in zip(self, items):
-            _items.append([x, y])
+        _items = [[x, y] for x, y in zip(self, items)]
         return self.__class__(_items)
 
     def set_appends(self, appends):
@@ -434,8 +410,7 @@ class Collection:
                 if hasattr(item, key) or (key in item):
                     items.append(getattr(item, key, item[key]))
             elif callable(key):
-                result = key(item)
-                if result:
+                if result := key(item):
                     items.append(result)
         return items
 
@@ -453,9 +428,7 @@ class Collection:
         return item
 
     def _value(self, value):
-        if callable(value):
-            return value()
-        return value
+        return value() if callable(value) else value
 
     def _check_is_callable(self, callback, raise_exception=True):
         if not callable(callback):
@@ -476,8 +449,7 @@ class Collection:
         return operators[op](a, b)
 
     def __iter__(self):
-        for item in self._items:
-            yield item
+        yield from self._items
 
     def __eq__(self, other):
         if isinstance(other, Collection):
@@ -537,8 +509,7 @@ def flatten(iterable):
     flat_list = []
     for item in iterable:
         if isinstance(item, list):
-            for subitem in flatten(item):
-                flat_list.append(subitem)
+            flat_list.extend(iter(flatten(item)))
         else:
             flat_list.append(item)
 

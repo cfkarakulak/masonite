@@ -56,9 +56,7 @@ class TestLimitingRequest(TestCase):
     def test_limiter_in_production(self):
         self.withExceptionsHandling()
         with self.debugMode(False):
-            count = 0
-            for _ in range(4):
-                count += 1
+            for count, _ in enumerate(range(4), start=1):
                 (
                     self.get("/throttled/global")
                     .assertOk()

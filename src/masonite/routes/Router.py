@@ -25,8 +25,7 @@ class Router:
 
     def route(self, name: str, parameters: dict = {}, query_params: dict = {}) -> str:
         """Return URL string from given route name and parameters."""
-        route = self.find_by_name(name)
-        if route:
+        if route := self.find_by_name(name):
             return route.to_url(parameters, query_params)
         raise RouteNotFoundException(f"Could not find route with the name '{name}'")
 
@@ -72,17 +71,17 @@ class Router:
                 if "@" in url:
                     url = url.replace("@", "").split(":")[0]
                     if isinstance(params, dict):
-                        compiled_url += str(params[url]) + "/"
+                        compiled_url += f"{str(params[url])}/"
                     elif isinstance(params, list):
-                        compiled_url += str(params.pop(0)) + "/"
+                        compiled_url += f"{str(params.pop(0))}/"
                 elif "?" in url:
                     url = url.replace("?", "").split(":")[0]
                     if isinstance(params, dict):
                         compiled_url += str(params.get(url, "/")) + "/"
                     elif isinstance(params, list):
-                        compiled_url += str(params.pop(0)) + "/"
+                        compiled_url += f"{str(params.pop(0))}/"
                 else:
-                    compiled_url += url + "/"
+                    compiled_url += f"{url}/"
 
         compiled_url = compiled_url.replace("//", "")
         # The loop isn't perfect and may have an unwanted trailing slash
@@ -95,6 +94,6 @@ class Router:
 
         # Add eventual query parameters
         if query_params:
-            compiled_url += "?" + parse.urlencode(query_params)
+            compiled_url += f"?{parse.urlencode(query_params)}"
 
         return compiled_url

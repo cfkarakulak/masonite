@@ -9,7 +9,7 @@ class Compact:
         cls.dictionary = {}
         for arg in args:
             if isinstance(arg, dict):
-                cls.dictionary.update(arg)
+                cls.dictionary |= arg
                 continue
 
             found = []
@@ -18,10 +18,10 @@ class Compact:
                     for f in found:
                         if value is f and f is not None:
                             raise AmbiguousError(
-                                "Cannot contain variables with multiple of the same object in scope. "
-                                "Getting {}".format(value)
+                                f"Cannot contain variables with multiple of the same object in scope. Getting {value}"
                             )
-                    cls.dictionary.update({key: value})
+
+                    cls.dictionary[key] = value
                     found.append(value)
 
         if len(args) != len(cls.dictionary):

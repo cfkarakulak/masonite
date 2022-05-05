@@ -952,11 +952,10 @@ class TestValidation(unittest.TestCase):
         self.assertEqual(
             validate.get("avatar"),
             [
-                "The avatar file is not a valid image. Allowed formats are {}.".format(
-                    ",".join(image_extensions)
-                )
+                f'The avatar file is not a valid image. Allowed formats are {",".join(image_extensions)}.'
             ],
         )
+
 
         import tempfile
 
@@ -1016,11 +1015,10 @@ class TestValidation(unittest.TestCase):
         self.assertEqual(
             validate.get("document"),
             [
-                "The document file is not a valid video. Allowed formats are {}.".format(
-                    ",".join(video_extensions)
-                )
+                f'The document file is not a valid video. Allowed formats are {",".join(video_extensions)}.'
             ],
         )
+
 
         import tempfile
 

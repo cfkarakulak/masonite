@@ -15,7 +15,7 @@ def is_local(obj_name, obj):
     return (
         not obj_name.startswith("__")
         and not obj_name.endswith("__")
-        and not type(obj).__name__ == "builtin_function_or_method"
+        and type(obj).__name__ != "builtin_function_or_method"
     )
 
 
@@ -25,15 +25,9 @@ def is_private(obj_name):
 
 def serialize_property(obj):
     if isinstance(obj, list):
-        local_list = []
-        for subobj in obj:
-            local_list.append(serialize_property(subobj))
-        return local_list
+        return [serialize_property(subobj) for subobj in obj]
     elif isinstance(obj, dict):
-        local_dict = {}
-        for key, val in obj.items():
-            local_dict.update({key: serialize_property(val)})
-        return local_dict
+        return {key: serialize_property(val) for key, val in obj.items()}
     elif hasattr(obj, "serialize"):
         return obj.serialize()
     else:
@@ -62,7 +56,7 @@ class Dump:
                     else:
                         local_properties["public"].update(entry)
 
-            objects.update({name: {"value": str(obj), "properties": local_properties}})
+            objects[name] = {"value": str(obj), "properties": local_properties}
 
         return {
             "objects": objects,

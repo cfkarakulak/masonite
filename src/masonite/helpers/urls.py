@@ -63,7 +63,4 @@ class UrlsHelper:
         """
 
         relative_url = self.app.make("router").route(name, params, query_params)
-        if absolute:
-            return self.url(relative_url)
-        else:
-            return relative_url
+        return self.url(relative_url) if absolute else relative_url

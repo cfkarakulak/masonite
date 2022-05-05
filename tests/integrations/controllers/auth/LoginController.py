@@ -10,9 +10,9 @@ class LoginController(Controller):
         return view.render("auth.login")
 
     def store(self, view: View, request: Request, auth: Auth, response: Response):
-        login = auth.attempt(request.input("username"), request.input("password"))
-
-        if login:
+        if login := auth.attempt(
+            request.input("username"), request.input("password")
+        ):
             return response.redirect(name="home")
 
         # Go back to login page

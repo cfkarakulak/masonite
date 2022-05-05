@@ -55,11 +55,7 @@ class VerifyCsrfToken(Middleware):
         Returns:
             bool
         """
-        for route in self.exempt:
-            if request.contains(route):
-                return True
-
-        return False
+        return any(request.contains(route) for route in self.exempt)
 
     def get_token(self, request):
         return (

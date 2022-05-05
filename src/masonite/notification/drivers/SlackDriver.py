@@ -71,9 +71,7 @@ class SlackDriver(BaseDriver):
                 headers={"Content-Type": "application/json"},
             )
             if response.status_code != 200:
-                raise NotificationException(
-                    "{}. Check Slack webhooks docs.".format(response.text)
-                )
+                raise NotificationException(f"{response.text}. Check Slack webhooks docs.")
 
     def send_via_api(self, slack_message):
         """Send Slack notification with Slack Web API as documented
@@ -86,9 +84,7 @@ class SlackDriver(BaseDriver):
             payload = slack_message.build().get_options()
             response = requests.post(self.send_url, payload).json()
             if not response["ok"]:
-                raise NotificationException(
-                    "{}. Check Slack API docs.".format(response["error"])
-                )
+                raise NotificationException(f'{response["error"]}. Check Slack API docs.')
             else:
                 return response
 

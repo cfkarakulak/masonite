@@ -14,12 +14,11 @@ class MockMail(Mail):
         self.driver = None
 
     def send(self, driver=None):
-        if driver:
-            self.driver = driver
-        else:
-            self.driver = self.options.get("driver", None) or config(
-                "mail.drivers.default"
-            )
+        self.driver = (
+            driver
+            or self.options.get("driver", None)
+            or config("mail.drivers.default")
+        )
 
         config_options = self.get_config_options(self.driver)
         if self.options.get("from"):

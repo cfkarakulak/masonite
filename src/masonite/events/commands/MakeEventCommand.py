@@ -26,8 +26,9 @@ class MakeEventCommand(Command):
         content = render_stub_file(self.get_stub_event_path(), name)
 
         relative_filename = os.path.join(
-            as_filepath(self.app.make("events.location")), name + ".py"
+            as_filepath(self.app.make("events.location")), f"{name}.py"
         )
+
         filepath = base_path(relative_filename)
         make_directory(filepath)
 

@@ -39,7 +39,7 @@ class Notifiable:
                 return self.email
             else:
                 raise NotificationException(
-                    "Notifiable model does not implement {}".format(method_name)
+                    f"Notifiable model does not implement {method_name}"
                 )
 
     @has_many("id", "notifiable_id")

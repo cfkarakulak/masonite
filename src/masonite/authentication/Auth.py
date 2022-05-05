@@ -71,9 +71,10 @@ class Auth:
         Returns:
             self
         """
-        if self._user:
-            return self._user
-        return self.get_guard().set_options(self.get_config_options()).user()
+        return (
+            self._user
+            or self.get_guard().set_options(self.get_config_options()).user()
+        )
 
     def register(self, dictionary):
         """Logout the current authenticated user.
@@ -100,14 +101,13 @@ class Auth:
         if not auth:
             return (None, None)
         try:
-            existing = (
+            if existing := (
                 self.application.make("builder")
                 .new()
                 .table(self.guard_config.get("password_reset_table"))
                 .where("email", email)
                 .first()
-            )
-            if existing:
+            ):
                 token = existing["token"]
             else:
                 self.application.make("builder").new().table(
@@ -163,7 +163,7 @@ class Auth:
         return True
 
     @classmethod
-    def routes(self):
+    def routes(cls):
         return [
             Route.get("/login", "auth.LoginController@show").name("login"),
             Route.get("/logout", "auth.LoginController@logout").name("logout"),

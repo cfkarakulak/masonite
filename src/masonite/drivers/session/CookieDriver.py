@@ -18,9 +18,9 @@ class CookieDriver:
         flashed = {}
         for key, value in request.cookie_jar.to_dict().items():
             if key.startswith("s_"):
-                data.update({key.replace("s_", ""): value})
+                data[key.replace("s_", "")] = value
             elif key.startswith("f_"):
-                flashed.update({key.replace("f_", ""): value})
+                flashed[key.replace("f_", "")] = value
 
         return {"data": data, "flashed": flashed}
 
